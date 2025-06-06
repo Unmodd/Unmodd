@@ -170,7 +170,7 @@ const CreatePost = () => {
                                 onChange={(e) => setPostBody(e.target.value)}
                                 style={defaultStyle} 
                                 placeholder="Share your thoughts, insights, or story here. Type @ to mention a user!"
-                                className="mentions-input" 
+                                className="description" 
                             >
                                 <Mention
                                     trigger="@"

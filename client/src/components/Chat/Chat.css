@@ -1,166 +1,158 @@
-
 :root {
-    
-    --chat-bg-deep: #0A0A0A; 
-    --chat-bg-medium: #1A1A1A; 
-    --chat-bg-light: #2C2C2C; 
-    --chat-border-subtle: #3A3A3A; 
+    /* Base Colors - Slightly softer darks, richer blue */
+    --chat-bg-deep: #080808; /* Near black, but not pure #000 */
+    --chat-bg-medium: #151515; /* Deeper than before */
+    --chat-bg-light: #282828; /* Still a dark grey */
+    --chat-border-subtle: #3A3A3A;
 
-    
-    --text-primary: #F0F0F0; 
-    --text-secondary: #999999; 
+    /* Text Colors */
+    --text-primary: #F0F0F0;
+    --text-secondary: #AAAAAA; /* Slightly lighter for readability */
 
-    
-    --accent-blue: #00BFFF; 
-    --accent-blue-hover: #009FE5; 
-    --my-message-bg: var(--accent-blue); 
-    --other-message-bg: var(--chat-bg-light); 
+    /* Accent Color - More vibrant, sophisticated blue */
+    --accent-blue: #00A3FF; /* A touch brighter, less stark */
+    --accent-blue-hover: #008ADF;
+    --my-message-bg: var(--accent-blue);
+    --other-message-bg: var(--chat-bg-light);
 
-    
-    --shadow-strong: rgba(0, 0, 0, 0.8);
-    --shadow-medium: rgba(0, 0, 0, 0.6);
-    --shadow-light: rgba(0, 0, 0, 0.3);
-    --shadow-inset-light: rgba(255, 255, 255, 0.05); 
+    /* Shadows - More diffuse, subtle */
+    --shadow-strong: rgba(0, 0, 0, 0.7);
+    --shadow-medium: rgba(0, 0, 0, 0.4);
+    --shadow-light: rgba(0, 0, 0, 0.2);
+    --shadow-inset-light: rgba(255, 255, 255, 0.03); /* Softer inset */
 
-    
-    --radius-xl: 25px; 
-    --radius-lg: 18px; 
-    --radius-sm: 8px; 
+    /* Radius */
+    --radius-xl: 28px; /* Slightly larger for modern feel */
+    --radius-lg: 20px; /* Aligned with XL */
+    --radius-sm: 10px; /* Slightly larger for consistency */
 
-    
-    --transition-fast: 0.12s ease-out; 
-    --transition-medium: 0.25s ease-out; 
-    --transition-slow: 0.5s cubic-bezier(0.25, 0.1, 0.25, 1); 
+    /* Transitions - Smoother, more natural easing */
+    --transition-fast: 0.15s ease-out;
+    --transition-medium: 0.3s cubic-bezier(0.2, 0.8, 0.4, 1); /* Bouncier for UI elements */
+    --transition-slow: 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
 
-    
-    --glass-blur: 20px; 
-    --glass-bg-opacity: 1; 
-    --glass-border-lightness: 0.2; 
-    --glass-shadow-strength: 0.2; 
-    --glass-backdrop-hue-rotate: 0deg; 
+    /* Glassmorphism Variables - More pronounced effect */
+    --glass-blur: 25px; /* Increased blur */
+    --glass-bg-opacity: 0.75; /* Slightly less transparent */
+    --glass-border-lightness: 0.25; /* Stronger border for definition */
+    --glass-shadow-strength: 0.25; /* More visible glass shadow */
+    --glass-backdrop-hue-rotate: 0deg;
 }
 
-
+/* --- Chat Container --- */
 .chat-slideup-container {
     position: fixed;
     top: 50%;
     left: 50%;
-    
-    transform: translate(-50%, -50%) scale(0.98);
-    filter: blur(10px); 
-    width: 100%; 
-    max-width: 100%; 
-    height: 100%; 
-    max-height: 100%; 
-    
+    transform: translate(-50%, -50%) scale(0.95); /* Start slightly smaller */
+    filter: blur(15px); /* Increased initial blur */
+    width: clamp(320px, 90vw, 450px); /* Responsive width control */
+    height: clamp(400px, 80vh, 700px); /* Responsive height control */
+
     transition: transform var(--transition-slow), opacity var(--transition-slow), filter var(--transition-slow);
     z-index: 1000;
-    
+
     box-shadow:
-        0 20px 60px var(--shadow-strong), 
-        0 0 0 1px var(--shadow-inset-light); 
-    border-radius: var(--radius-xl); 
+        0 25px 80px var(--shadow-strong), /* Deeper main shadow */
+        0 0 0 1px var(--shadow-inset-light);
+    border-radius: var(--radius-xl);
     overflow: hidden;
-    opacity: 0; 
+    opacity: 0;
     pointer-events: none;
-    
-    backdrop-filter: blur(var(--glass-blur)) hue-rotate(var(--glass-backdrop-hue-rotate)); 
-    -webkit-backdrop-filter: blur(var(--glass-blur)) hue-rotate(var(--glass-backdrop-hue-rotate)); 
-    background-color: rgba(10, 10, 10, var(--glass-bg-opacity)); 
-    border: 1px solid rgba(255, 255, 255, var(--glass-border-lightness)); 
+
+    backdrop-filter: blur(var(--glass-blur)) hue-rotate(var(--glass-backdrop-hue-rotate));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) hue-rotate(var(--glass-backdrop-hue-rotate));
+    background-color: rgba(10, 10, 10, var(--glass-bg-opacity));
+    border: 1px solid rgba(255, 255, 255, var(--glass-border-lightness));
 }
 
-
 .chat-hidden {
-    
-    transform: translate(-50%, -50%) scale(0.98);
-    filter: blur(10px);
+    transform: translate(-50%, -50%) scale(0.95);
+    filter: blur(15px);
     opacity: 0;
     pointer-events: none;
 }
 
 .chat-visible {
-    
     transform: translate(-50%, -50%) scale(1);
     filter: blur(0);
     opacity: 1;
     pointer-events: auto;
 }
 
-
 .chat-minimal {
-    background: transparent; 
+    background: transparent;
     color: var(--text-primary);
-    border-radius: var(--radius-xl); 
+    border-radius: var(--radius-xl);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
-    
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4); /* Softer inset shadow */
 }
 
-
+/* --- Header --- */
 .chat-header {
-    padding: 1.2rem 1.8rem; 
+    padding: 1.2rem 1.8rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 1.2rem;
-    font-weight: 700; 
-    
-    background-color: rgba(26, 26, 26, 0.6); 
-    backdrop-filter: blur(calc(var(--glass-blur) / 2)); 
+    font-size: 1.25rem; /* Slightly larger text */
+    font-weight: 600; /* Medium bold */
+
+    background-color: rgba(21, 21, 21, 0.8); /* Use deeper medium bg with more opacity */
+    backdrop-filter: blur(calc(var(--glass-blur) / 2));
     -webkit-backdrop-filter: blur(calc(var(--glass-blur) / 2));
     border-bottom: 1px solid var(--chat-border-subtle);
     color: var(--text-primary);
     cursor: grab;
-    user-select: none; 
-    box-shadow: 0 5px 15px rgba(0, 0, 0, var(--glass-shadow-strength)); 
+    user-select: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, var(--glass-shadow-strength));
+    border-top-left-radius: var(--radius-xl); /* Rounded top corners */
+    border-top-right-radius: var(--radius-xl);
 }
 
 .chat-header button {
     background: none;
     border: none;
     color: var(--text-secondary);
-    font-size: 1.6rem; 
+    font-size: 1.7rem; /* Larger icon */
     cursor: pointer;
     transition: color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-fast);
-    padding: 8px; 
+    padding: 10px; /* More padding for larger hit area */
     border-radius: 50%;
-    display: flex; 
+    display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .chat-header button:hover {
     color: var(--text-primary);
-    background-color: rgba(255, 255, 255, 0.08); 
-    transform: scale(1.08); 
+    background-color: rgba(255, 255, 255, 0.12); /* Brighter hover */
+    transform: scale(1.1); /* More pronounced scale */
 }
 
 .chat-header button:active {
-    transform: scale(0.92); 
-    background-color: rgba(255, 255, 255, 0.03);
+    transform: scale(0.9); /* More pronounced active */
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
-
+/* --- Chat Body / Messages Area --- */
 .chat-body {
     flex: 1;
     overflow-y: auto;
-    padding: 1.5rem 1.8rem; 
+    padding: 1.5rem 1.8rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem; 
+    gap: 1.1rem; /* Slightly more space between messages */
     scroll-behavior: smooth;
-    background-color: transparent; 
+    background-color: transparent;
     position: relative;
 }
 
-
 .chat-body::-webkit-scrollbar {
-    width: 6px; 
+    width: 8px; /* Slightly wider scrollbar */
 }
 
 .chat-body::-webkit-scrollbar-track {
@@ -169,114 +161,111 @@
 }
 
 .chat-body::-webkit-scrollbar-thumb {
-    background-color: #555; 
+    background-color: #666; /* Slightly lighter for contrast */
     border-radius: var(--radius-sm);
-    border: 2px solid var(--chat-bg-deep); 
+    border: 2px solid var(--chat-bg-deep);
 }
 
 .chat-body::-webkit-scrollbar-thumb:hover {
-    background-color: #777;
+    background-color: #888;
 }
 
-
+/* --- Messages --- */
 .chat-message {
-    font-size: 1rem; 
-    max-width: 78%; 
-    padding: 0.9rem 1.3rem; 
+    font-size: 1rem;
+    max-width: 80%; /* Slightly wider messages */
+    padding: 1rem 1.4rem; /* More generous padding */
     word-break: break-word;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, var(--glass-shadow-strength)); 
-    line-height: 1.5;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, var(--glass-shadow-strength)); /* More defined shadow */
+    line-height: 1.6; /* Increased line height for readability */
     position: relative;
     white-space: pre-wrap;
-    transition: transform var(--transition-fast), box-shadow var(--transition-fast); 
-    background-color: rgba(255, 255, 255, 0.05); 
-    backdrop-filter: blur(5px); 
-    -webkit-backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.08); 
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    background-color: rgba(255, 255, 255, 0.08); /* More subtle background */
+    backdrop-filter: blur(8px); /* Increased message bubble blur */
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.12); /* More defined border */
 }
 
 .chat-message:hover {
-    transform: translateY(-3px); 
-    box-shadow: 0 6px 16px rgba(0, 0, 0, calc(var(--glass-shadow-strength) * 1.5)); 
+    transform: translateY(-4px); /* More pronounced lift */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, calc(var(--glass-shadow-strength) * 1.8)); /* Stronger hover shadow */
 }
 
-
 .chat-message.new {
-    animation: message-rise-in 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards; 
+    animation: message-rise-in 0.5s cubic-bezier(0.2, 0.8, 0.4, 1) forwards; /* Softer, slightly slower animation */
     opacity: 0;
-    transform: translateY(15px); 
+    transform: translateY(20px);
 }
 
 @keyframes message-rise-in {
-    0% { opacity: 0; transform: translateY(15px); }
+    0% { opacity: 0; transform: translateY(20px); }
     100% { opacity: 1; transform: translateY(0); }
 }
 
-
 .chat-me {
-    background-color: rgba(0, 191, 255, 0.3); 
+    background-color: rgba(0, 163, 255, 0.4); /* Brighter accent blue with more transparency */
     align-self: flex-end;
     color: white;
-    
     border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg);
-    border: 1px solid rgba(0, 191, 255, 0.4); 
+    border: 1px solid rgba(0, 163, 255, 0.5); /* Stronger border for accent */
 }
 
 .chat-other {
-    background-color: rgba(44, 44, 44, 0.4); 
+    background-color: rgba(40, 40, 40, 0.5); /* Lighter bg with more transparency */
     align-self: flex-start;
     color: var(--text-primary);
-    
     border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm);
-    border: 1px solid rgba(44, 44, 44, 0.5); 
+    border: 1px solid rgba(40, 40, 40, 0.6); /* Stronger border */
 }
 
 .chat-user {
-    font-weight: 700; 
+    font-weight: 700;
     color: var(--text-secondary);
     display: block;
-    margin-bottom: 0.35rem; 
-    font-size: 0.85rem; 
-    letter-spacing: 0.03em; 
-    text-transform: capitalize; 
+    margin-bottom: 0.4rem; /* More space */
+    font-size: 0.9rem; /* Slightly larger */
+    letter-spacing: 0.04em; /* More subtle spacing */
+    text-transform: capitalize;
 }
 
-
 .chat-time {
-    font-size: 0.75rem; 
-    margin-top: 0.5rem;
+    font-size: 0.8rem; /* Slightly larger */
+    margin-top: 0.6rem;
     color: var(--text-secondary);
-    opacity: 0.75; 
+    opacity: 0.85; /* Less opaque for better readability */
     text-align: right;
     display: block;
     font-style: italic;
-    font-weight: 400; 
+    font-weight: 400;
 }
 
 .chat-me .chat-time {
-    color: rgba(255, 255, 255, 0.7); 
+    color: rgba(255, 255, 255, 0.8); /* Slightly more opaque */
 }
 
-
+/* --- Input Area --- */
 .chat-input {
-    padding: 1.2rem 1.8rem; 
+    padding: 1.2rem 1.8rem;
     display: flex;
     gap: 1rem;
     border-top: 1px solid var(--chat-border-subtle);
-    
-    background-color: rgba(26, 26, 26, 0.6); 
-    backdrop-filter: blur(calc(var(--glass-blur) / 2)); 
+
+    background-color: rgba(21, 21, 21, 0.8); /* Consistent with header background */
+    backdrop-filter: blur(calc(var(--glass-blur) / 2));
     -webkit-backdrop-filter: blur(calc(var(--glass-blur) / 2));
-    box-shadow: 0 -5px 15px rgba(0, 0, 0, var(--glass-shadow-strength)); 
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, var(--glass-shadow-strength));
+    border-bottom-left-radius: var(--radius-xl); /* Rounded bottom corners */
+    border-bottom-right-radius: var(--radius-xl);
 }
 
 .chat-input input {
     flex: 1;
-    padding: 0.9rem 1.4rem; 
-    border-radius: var(--radius-lg); 
-    border: 1px solid rgba(255, 255, 255, 0.1); 
+    padding: 1rem 1.5rem; /* More padding */
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.15); /* Stronger subtle border */
     outline: none;
-    background-color: rgba(10, 10, 10, 0.4); 
+    background-color: rgba(10, 10, 10, 0.5); /* Slightly more opaque input bg */
     color: var(--text-primary);
     font-size: 1rem;
     transition: background-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
@@ -284,32 +273,32 @@
 
 .chat-input input::placeholder {
     color: var(--text-secondary);
-    opacity: 0.7;
+    opacity: 0.8; /* More visible placeholder */
 }
 
 .chat-input input:focus {
-    background-color: rgba(34, 34, 34, 0.5); 
-    box-shadow: 0 0 0 3px var(--accent-blue); 
-    transform: scale(1.002); 
+    background-color: rgba(30, 30, 30, 0.6); /* Clearer focus state */
+    box-shadow: 0 0 0 3px var(--accent-blue), inset 0 0 5px rgba(0, 0, 0, 0.3); /* Accent glow + subtle inset */
+    transform: scale(1.005); /* Very subtle scale on focus */
 }
 
 .chat-input button {
     background-color: var(--accent-blue);
     color: white;
-    padding: 0.9rem 2rem; 
+    padding: 1rem 2.2rem; /* More generous button padding */
     border: none;
-    border-radius: var(--radius-lg); 
+    border-radius: var(--radius-lg);
     cursor: pointer;
     font-size: 1rem;
     font-weight: 700;
     transition: background-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, var(--glass-shadow-strength)); 
+    box-shadow: 0 5px 15px rgba(0, 0, 0, var(--glass-shadow-strength));
 }
 
 .chat-input button:hover {
     background-color: var(--accent-blue-hover);
-    transform: translateY(-2px); 
-    box-shadow: 0 7px 18px rgba(0, 0, 0, calc(var(--glass-shadow-strength) * 1.5)); 
+    transform: translateY(-3px); /* More noticeable lift */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, calc(var(--glass-shadow-strength) * 1.8));
 }
 
 .chat-input button:active {
@@ -317,112 +306,138 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, calc(var(--glass-shadow-strength) * 0.5));
 }
 
-
+/* --- Online Indicator --- */
 .group-icon {
     position: relative;
-    
 }
 
 .online-indicator {
     position: absolute;
-    bottom: -2px; 
-    right: -2px;
-    width: 15px; 
-    height: 15px;
-    background-color: #4CAF50; 
+    bottom: -3px; /* Adjusted position */
+    right: -3px; /* Adjusted position */
+    width: 16px; /* Slightly larger */
+    height: 16px;
+    background-color: #4CAF50;
     border-radius: 50%;
-    border: 3px solid var(--chat-bg-deep); 
-    box-shadow: none; 
-    animation: gentle-pulse-online 2s infinite ease-in-out; 
+    border: 3px solid var(--chat-bg-deep);
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.6); /* Subtle glow */
+    animation: gentle-pulse-online 2s infinite ease-in-out;
 }
-
-
-
 
 @keyframes gentle-pulse-online {
     0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.03); opacity: 0.9; } 
+    50% { transform: scale(1.05); opacity: 0.95; } /* Softer pulse */
     100% { transform: scale(1); opacity: 1; }
 }
 
-
+/* --- Responsive Adjustments (Mobile First) --- */
 @media (max-width: 600px) {
     .chat-slideup-container {
-        width: 100%;
-        border-radius: 0; 
-        max-width: 100%;
-        height: 100vh; 
+        width: 100vw;
+        border-radius: 0;
+        max-width: 100vw;
+        height: 100vh;
         max-height: 100vh;
-        
-        transform: translate(-50%, -50%) scale(1); 
-        filter: blur(0); 
-        opacity: 1; 
-        transition: none; 
-        backdrop-filter: none; 
+        transform: none; /* Remove transform on mobile for full screen */
+        filter: none; /* Remove blur on mobile */
+        opacity: 1;
+        transition: none; /* Remove transitions for snappier mobile experience */
+        backdrop-filter: none; /* Remove glassmorphism on mobile for performance/clarity */
         -webkit-backdrop-filter: none;
-        background-color: var(--chat-bg-deep); 
+        background-color: var(--chat-bg-deep); /* Solid background on mobile */
         border: none;
+        box-shadow: none; /* No extra shadows on mobile */
     }
 
     .chat-visible.chat-slideup-container {
-        transform: translate(-50%, -50%) scale(1);
-        filter: blur(0);
+        transform: none;
+        filter: none;
         opacity: 1;
     }
 
     .chat-header {
-        padding: 1rem; 
+        padding: 1rem;
         font-size: 1.1rem;
-        backdrop-filter: none; 
+        backdrop-filter: none;
         -webkit-backdrop-filter: none;
-        background-color: var(--chat-bg-medium); 
+        background-color: var(--chat-bg-medium); /* Solid background */
+        border-radius: 0; /* No rounded corners on full screen */
+        box-shadow: none;
     }
 
     .chat-header button {
-        font-size: 1.4rem;
-        padding: 6px;
+        font-size: 1.5rem;
+        padding: 8px;
     }
 
     .chat-body {
-        padding: 1rem; 
+        padding: 1rem;
         gap: 0.8rem;
     }
 
     .chat-input {
-        padding: 1rem; 
+        padding: 1rem;
         gap: 0.8rem;
-        backdrop-filter: none; 
+        backdrop-filter: none;
         -webkit-backdrop-filter: none;
-        background-color: var(--chat-bg-medium); 
+        background-color: var(--chat-bg-medium); /* Solid background */
+        border-radius: 0; /* No rounded corners */
+        box-shadow: none;
     }
 
     .chat-input input {
         padding: 0.8rem 1.2rem;
         font-size: 0.95rem;
-        background-color: var(--chat-bg-deep); 
+        background-color: var(--chat-bg-deep); /* Solid background */
+        border: none;
+        box-shadow: none;
+    }
+
+    .chat-input input:focus {
+        box-shadow: 0 0 0 2px var(--accent-blue); /* Simpler focus on mobile */
+        transform: none;
     }
 
     .chat-input button {
         padding: 0.8rem 1.6rem;
         font-size: 0.95rem;
+        box-shadow: none; /* No extra shadows on buttons */
+        transform: none;
+    }
+
+    .chat-input button:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .chat-input button:active {
+        transform: none;
+        box-shadow: none;
     }
 
     .chat-message {
-        font-size: 0.9rem;
-        padding: 0.8rem 1.1rem;
-        backdrop-filter: none; 
+        font-size: 0.95rem;
+        padding: 0.8rem 1.2rem;
+        backdrop-filter: none;
         -webkit-backdrop-filter: none;
-        border: none; 
-        background-color: rgba(255, 255, 255, 0.08); 
+        border: none; /* No borders on messages for simplicity */
+        background-color: rgba(255, 255, 255, 0.1); /* Slightly more opaque background */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Simpler shadow on mobile */
+        transform: none;
+    }
+
+    .chat-message:hover {
+        transform: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
 
     .chat-me {
-        background-color: var(--my-message-bg); 
+        background-color: var(--my-message-bg); /* Solid background */
         border: none;
     }
 
     .chat-other {
-        background-color: var(--other-message-bg); 
+        background-color: var(--other-message-bg); /* Solid background */
         border: none;
     }
 
@@ -440,6 +455,7 @@
         border: 2px solid var(--chat-bg-deep);
         bottom: -1px;
         right: -1px;
-        animation: none; 
+        animation: none; /* No pulse animation on mobile */
+        box-shadow: none;
     }
 }
