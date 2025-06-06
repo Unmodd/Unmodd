@@ -22,7 +22,7 @@ function App() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [isChatWindowOpen, setIsChatWindowOpen] = useState(false);
 
-    const currentAuthData = useSelector((state) => state.currentUser);
+    const currentAuthData = useSelector((state) => state.currentUserReducer); 
     const currentUser = currentAuthData?.result;
     const currentUserId = currentUser?._id;
 
@@ -31,7 +31,7 @@ function App() {
         if (profile) {
             try {
                 const parsedProfile = JSON.parse(profile);
-                dispatch({ type: 'AUTH', payload: parsedProfile });
+                dispatch({ type: 'AUTH', data: parsedProfile });
                 console.log("[App.js Init] Loaded user from localStorage and dispatched AUTH:", parsedProfile);
             } catch (e) {
                 console.error("[App.js Init] Failed to parse profile from localStorage:", e);
@@ -62,7 +62,7 @@ function App() {
             }
             appSocket.emit('join', currentUserId);
         } else {
-            if (appSocket.connected) {
+            if (appSocket.connected && appSocket.io.opts.query?.userId) {
                 console.log("[App.js] User logged out or no user yet. Disconnecting socket.");
                 appSocket.disconnect();
             }

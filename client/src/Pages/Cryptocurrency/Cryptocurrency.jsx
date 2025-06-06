@@ -22,8 +22,8 @@ const Cryptocurrency = () => {
     const socket = useRef(null);
     const [boostAmount, setBoostAmount] = useState(100);
     const navigate = useNavigate();
+    
     const user = useSelector((state) => state.currentUserReducer);
-
     const isAdmin = user?.result?._id === process.env.REACT_APP_ADMIN_ID;
 
     const postsList = useSelector((state) => state.postsReducer);
