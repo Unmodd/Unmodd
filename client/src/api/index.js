@@ -1,10 +1,8 @@
 import axios from 'axios';
 
-
-const BASE_URL = 'http://localhost:5000'; 
-console.log("[API] Axios Base URL:", BASE_URL);
-
 const API = axios.create({ baseURL: process.env.REACT_APP_BACKEND_URL });
+
+console.log("[API] Axios Base URL (from env):", process.env.REACT_APP_BACKEND_URL);
 
 
 API.interceptors.request.use((req) => {
@@ -32,7 +30,6 @@ API.interceptors.request.use((req) => {
     return Promise.reject(error);
 });
 
-
 API.interceptors.response.use((response) => {
     console.log("[API Interceptor] Successful Response - URL:", response.config.url, "Status:", response.status, "Data:", response.data);
     return response;
@@ -47,13 +44,12 @@ API.interceptors.response.use((response) => {
     return Promise.reject(error);
 });
 
-API.interceptors.request.use((req) => {
-    if (localStorage.getItem('Profile')) {
-        req.headers.authorization = `Bearer ${JSON.parse(localStorage.getItem('Profile')).token}`;
-    }
-    return req;
-});
-
+ API.interceptors.request.use((req) => {
+     if (localStorage.getItem('Profile')) {
+         req.headers.authorization = `Bearer ${JSON.parse(localStorage.getItem('Profile')).token}`;
+     }
+     return req;
+ });
 
 
 export const checkDailyGM = () => API.post('/gamification/daily-gm');
@@ -68,8 +64,6 @@ export const postComment = (postId, commentData) => API.post(`/comment/${postId}
 export const deleteComment = (commentId, data) => API.delete(`/comment/${commentId}`, { data });
 export const fetchPostSuggestions = (query) => API.get(`/posts/suggestions?q=${query}`);
 export const searchUsers = (query) => API.get(`/api/users/search?q=${query}`);
-
-
 
 export const getAllUsers = () => {
     console.log("[API] Calling getAllUsers");
@@ -99,27 +93,17 @@ export const toggleTask = (userId, taskId) => {
     return API.patch(`/api/users/${userId}/tasks/${taskId}/toggle`);
 };
 
-
-
-
-
-
-
 export const fetchNotifications = () => API.get('/notifications'); 
 export const markNotificationsAsRead = (notificationIds) => API.put('/notifications/mark-read', { notificationIds }); 
 export const getUnreadNotificationCount = () => API.get('/notifications/unread-count'); 
-
 
 export const completeManualTask = (userId, taskId) => {
     console.log(`[API] Calling completeManualTask for User ID: ${userId}, Task ID: ${taskId}`);
     return API.post(`/api/users/${userId}/tasks/complete-manual`, { taskId });
 };
 
-
-
 export const togglePinPost = (id) => {
     console.log(`[API] Calling togglePinPost for ID: ${id}`);
-
     return API.post(`/posts/pin/${id}`, {});
 };
 
@@ -127,6 +111,5 @@ export const boostUpvotes = (postId, amount) => {
     console.log(`[API] Calling boostUpvotes for Post ID: ${postId} with amount: ${amount}`);
     return API.patch(`/posts/boost/${postId}`, { amount });
 };
-
 
 export default API;
