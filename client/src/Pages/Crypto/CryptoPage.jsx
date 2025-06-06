@@ -41,7 +41,6 @@ const CryptoPage = () => {
     <div className="home-container-1">
       <div className="main-content">
         <div className="main-bar">
-           <BannerScroller />
            <LeaderboardComponent users={users} />
           <div className="main-bar-header">
             {}

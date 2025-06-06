@@ -95,21 +95,6 @@ function App() {
                 <AllRoutes currentUser={currentUser} selectedUser={selectedUser} onSelectUser={handleSelectUser} />
                 {currentUserId && <UserDock currentUserId={currentUserId} />}
             </Router>
-            {currentUserId && (
-                <GroupDock
-                    onSelectUser={handleSelectUser}
-                    currentUserId={currentUserId}
-                    socket={appSocket}
-                />
-            )}
-            {selectedUser && currentUserId && isChatWindowOpen && (
-                <ChatWindow
-                    user={selectedUser}
-                    onClose={handleCloseChat}
-                    currentUserId={currentUserId}
-                    socket={appSocket}
-                />
-            )}
         </div>
     );
 }

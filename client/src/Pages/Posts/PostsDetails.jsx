@@ -279,7 +279,7 @@ const PostsDetails = () => {
                                 <Link
                                     to={`/Users/${currentPost.userId}`}
                                     className="user-link"
-                                    style={{ color: '#00fff6' }}
+                                    style={{ color: '#ffffff' }}
                                 >
                                     <Avatar backgroundColor="#00BFFF" color="#000" px="12px" py="5px">
                                         {currentPost.userPosted.charAt(0).toUpperCase()}

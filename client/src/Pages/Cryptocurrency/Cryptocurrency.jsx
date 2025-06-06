@@ -137,7 +137,6 @@ const Cryptocurrency = () => {
         <div className="home-container-1">
             <div className="main-content">
                 <div className="main-bar">
-                    <BannerScroller />
                     <div className="main-bar-header">
                         <div className="filter-bar">
                             <div
@@ -246,20 +245,6 @@ const Cryptocurrency = () => {
                 <div className="global-chat">
                     <h3>Global Chat</h3>
                     <CryptoTicker />
-                    {selectedUser && (
-                        <ChatWindow
-                            user={selectedUser}
-                            onClose={() => setSelectedUser(null)}
-                        />
-                    )}
-                    <div className="chat-messages">
-                        {globalMessages.map((msg) => (
-                            <div key={msg.id} className={`chat-message ${user?.result?._id === msg.userId ? "own" : ""}`}>
-                                <span className="chat-user">{msg.senderName}:</span> {msg.text}
-                            </div>
-                        ))}
-                        <div ref={globalMessagesEndRef} />
-                    </div>
                     <div className="chat-input-area">
                         <input
                             type="text"

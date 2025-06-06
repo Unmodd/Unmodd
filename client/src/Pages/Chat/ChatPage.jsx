@@ -10,22 +10,10 @@ const ChatPage = () => {
 
   return (
     <div className="relative min-h-screen bg-zinc-950 text-white">
-      {}
       <div className="p-6">
         <h1 className="text-3xl font-bold">Chat App</h1>
         <p className="text-zinc-400">Select a user to start chatting.</p>
       </div>
-
-      {}
-      <GroupDock onSelectUser={setSelectedUser} />
-
-      {}
-      {selectedUser && (
-        <ChatWindow
-          user={selectedUser}
-          onClose={() => setSelectedUser(null)}
-        />
-      )}
     </div>
   );
 };
