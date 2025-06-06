@@ -147,6 +147,8 @@ button {
 
 .post-votes {
     display: flex;
+    padding-left: 15px;
+    padding-right: 15px;
     flex-direction: row;
     justify-content: center;
     gap: 25px;
@@ -352,9 +354,7 @@ h3 {
 }
 
 .comments-section {
-    padding: 30px; /* Kept existing padding */
-    width: 100%; /* Ensure it takes full width */
-    max-width: 1500px; /* Match glass-card max-width */
+    padding: 20px; /* Kept existing padding */
     margin-bottom: 25px; /* Consistent spacing */
     opacity: 0; /* For animation */
     transform: translateY(20px); /* For animation */

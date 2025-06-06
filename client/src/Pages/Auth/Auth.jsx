@@ -100,9 +100,6 @@ const Auth = () => {
                     <label htmlFor="password">
                         <div className="password-header"> {}
                             <h4>Password</h4>
-                            {!isSignup && (
-                                <span className="forgot-password-link">Forgot password?</span> 
-                            )}
                         </div>
                         <input
                             type="password"
