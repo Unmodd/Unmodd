@@ -11,11 +11,11 @@ const TopCrypto = () => {
   useEffect(() => {
     const fetchCrypto = async () => {
       try {
-        const response = await axios.get('/api/crypto/top');
+        const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/crypto/top`);
+
         const newData = response.data;
 
         setCryptoData(prevData => {
-
           const updatedData = newData.map(coin => {
             const currentPrice = coin.quote?.USD?.price;
             const prevPrice = prevPrices.current[coin.id];
@@ -29,7 +29,6 @@ const TopCrypto = () => {
               }
             }
             
-
             prevPrices.current[coin.id] = currentPrice;
 
             return { ...coin, priceChangeClass }; 
@@ -44,9 +43,7 @@ const TopCrypto = () => {
       }
     };
 
-
     fetchCrypto();
-
 
     const interval = setInterval(fetchCrypto, 15000); 
 
@@ -68,7 +65,6 @@ const TopCrypto = () => {
         const arrow = isPositive ? '▲' : '▼';
 
         return (
-
           <div key={coin.id} className={`crypto-item ${coin.priceChangeClass || ''}`}>
             <span className="crypto-symbol">{coin.symbol}</span>
             <span className="crypto-price">${coin.quote?.USD?.price?.toFixed(2)}</span>
