@@ -1,28 +1,26 @@
-
-
 import Posts from '../models/Posts.js';
 import mongoose from 'mongoose';
-import User from '../models/auth.js'; 
-import Notification from '../models/Notification.js'; 
-import { createNotification } from './notifications.js'; 
+import User from '../models/auth.js';
+import Notification from '../models/Notification.js';
+import { createNotification } from './notifications.js';
 import DailyTaskTemplate from '../models/dailyTaskTemplate.js';
 import { addXP, checkAndAwardAchievements, completeTaskByCriteria } from './gamification.js';
 
 
 const extractMentions = (text) => {
-    const mentionRegex = /@([a-zA-Z0-9_.]+)/g; 
+    const mentionRegex = /@([a-zA-Z0-9_.]+)/g;
     const mentions = [];
     let match;
     while ((match = mentionRegex.exec(text)) !== null) {
-        mentions.push(match[1]); 
+        mentions.push(match[1]);
     }
-    return [...new Set(mentions)]; 
+    return [...new Set(mentions)];
 };
 
 export const CreatePost = async (req, res) => {
     console.log(`\n--- [CreatePost] START ---`);
     const { postTitle, postBody, postTags, mediaUrls, userPosted, userId, category } = req.body;
-    const currentUserId = req.userId; 
+    const currentUserId = req.userId;
 
     if (!category) {
         console.error(`[CreatePost] ERROR: Category is missing from request body.`);
@@ -37,7 +35,7 @@ export const CreatePost = async (req, res) => {
         postTags,
         mediaUrls,
         userPosted,
-        userId: currentUserId, 
+        userId: currentUserId,
         category,
         postedOn: new Date().toISOString()
     });
@@ -57,14 +55,13 @@ export const CreatePost = async (req, res) => {
             console.log(`[CreatePost] Found mentioned users:`, mentionedUsers.map(u => u.username));
 
             for (const mentionedUser of mentionedUsers) {
-
                 if (mentionedUser._id.toString() !== currentUserId) {
                     await createNotification(
                         mentionedUser._id, 
                         currentUserId, 
                         'mention', 
-                        `You were mentioned in a post by ${userPosted}: "${postTitle.substring(0, 50)}..."`, 
-                        `/posts/${postPost._id}` 
+                        `You were mentioned in a post by ${userPosted}: "${postTitle.substring(0, 50)}..."`,
+                        `/posts/${postPost._id}`
                     );
                     console.log(`[CreatePost] Created mention notification for ${mentionedUser.username}`);
                 } else {
@@ -73,22 +70,15 @@ export const CreatePost = async (req, res) => {
             }
         }
 
-
-
-
         const user = await User.findById(currentUserId);
         if (user) {
             console.log(`[CreatePost] User found: ${user.email}`);
-            const oldPostsCount = user.postsCount || 0;
-            user.postsCount = oldPostsCount + 1;
 
-
-            user.weeklyPostsCount = (user.weeklyPostsCount || 0) + 1;
-            console.log(`[CreatePost] User ${user.email} postsCount updated to ${user.postsCount}. weeklyPostsCount updated to ${user.weeklyPostsCount}.`);
-
-
+            await User.findByIdAndUpdate(currentUserId, { $inc: { postsCount: 1, weeklyPostsCount: 1 } });
+            const updatedUser = await User.findById(currentUserId);
+            console.log(`[CreatePost] User ${updatedUser.email} postsCount updated to ${updatedUser.postsCount}. weeklyPostsCount updated to ${updatedUser.weeklyPostsCount}.`);
             const createPostTaskTemplate = await DailyTaskTemplate.findOne({ criteria: 'create_post_any_type', type: 'weekly' });
-            if (createPostTaskTemplate && user.weeklyPostsCount <= createPostTaskTemplate.maxCompletions) {
+            if (createPostTaskTemplate && updatedUser.weeklyPostsCount <= createPostTaskTemplate.maxCompletions) {
                 await completeTaskByCriteria(currentUserId, 'create_post_any_type');
                 console.log(`[CreatePost] Checked 'create_post_any_type' for user ${currentUserId}.`);
             } else if (!createPostTaskTemplate) {
@@ -97,13 +87,13 @@ export const CreatePost = async (req, res) => {
                 console.log(`[CreatePost] User ${currentUserId} has reached max completions (${createPostTaskTemplate.maxCompletions}) for 'create_post_any_type' this week.`);
             }
 
-
             if (req.body.type === 'moonshot' || req.body.isMoonshot) {
-                user.weeklyMoonshotsCount = (user.weeklyMoonshotsCount || 0) + 1;
-                console.log(`[CreatePost] User ${user.email} weeklyMoonshotsCount updated to ${user.weeklyMoonshotsCount}.`);
+                await User.findByIdAndUpdate(currentUserId, { $inc: { weeklyMoonshotsCount: 1 } });
+                const updatedUserForMoonshot = await User.findById(currentUserId); 
+                console.log(`[CreatePost] User ${updatedUserForMoonshot.email} weeklyMoonshotsCount updated to ${updatedUserForMoonshot.weeklyMoonshotsCount}.`);
 
                 const moonshotTaskTemplate = await DailyTaskTemplate.findOne({ criteria: 'post_moonshot_10x', type: 'weekly' });
-                if (moonshotTaskTemplate && user.weeklyMoonshotsCount <= moonshotTaskTemplate.maxCompletions) {
+                if (moonshotTaskTemplate && updatedUserForMoonshot.weeklyMoonshotsCount <= moonshotTaskTemplate.maxCompletions) {
                     await completeTaskByCriteria(currentUserId, 'post_moonshot_10x');
                     console.log(`[CreatePost] Checked 'post_moonshot_10x' for user ${currentUserId}.`);
                 } else if (!moonshotTaskTemplate) {
@@ -112,9 +102,6 @@ export const CreatePost = async (req, res) => {
                     console.log(`[CreatePost] User ${currentUserId} has reached max completions (${moonshotTaskTemplate.maxCompletions}) for 'post_moonshot_10x' this week.`);
                 }
             }
-
-            await user.save();
-            console.log(`[CreatePost] User ${user.email} document saved.`);
 
             await checkAndAwardAchievements(currentUserId, 'create_post');
             console.log(`[CreatePost] Checked achievements for user ${currentUserId} after creating post.`);
@@ -147,7 +134,8 @@ export const getAllPosts = async (req, res) => {
 export const deletePost = async (req, res) => {
     console.log(`\n--- [deletePost] START ---`);
     const { id: _id } = req.params;
-    console.log(`[deletePost] Request to delete post ID: ${_id}`);
+    const currentUserId = req.userId; 
+    console.log(`[deletePost] Request to delete post ID: ${_id} by user ID: ${currentUserId}`);
 
     if (!mongoose.Types.ObjectId.isValid(_id)) {
         console.error(`[deletePost] ERROR: Invalid Post ID: ${_id}`);
@@ -161,14 +149,15 @@ export const deletePost = async (req, res) => {
             return res.status(404).json({ message: "Post not found." });
         }
 
+        if (postToDelete.userId.toString() !== currentUserId && currentUserId !== process.env.ADMIN_ID) {
+            console.warn(`[deletePost] Unauthorized: User ${currentUserId} tried to delete post ${_id} (owned by ${postToDelete.userId}).`);
+            return res.status(403).json({ message: "You are not authorized to delete this post." });
+        }
+
         if (postToDelete.userId) {
             console.log(`[deletePost] Post owner is ${postToDelete.userId}. Decrementing postsCount for this user.`);
-            const user = await User.findById(postToDelete.userId);
-            if (user) {
-                user.postsCount = Math.max(0, (user.postsCount || 0) - 1);
-                await user.save();
-                console.log(`[deletePost] User ${user.email} postsCount decremented to ${user.postsCount}.`);
-            }
+            await User.findByIdAndUpdate(postToDelete.userId, { $inc: { postsCount: -1 } });
+            console.log(`[deletePost] User postsCount decremented.`);
         }
 
         await Posts.findByIdAndRemove(_id);
@@ -200,7 +189,7 @@ export const votePost = async (req, res) => {
     }
 
     try {
-        const post = await Posts.findById(_id);
+        let post = await Posts.findById(_id); 
         const user = await User.findById(userId);
 
         if (!post) {
@@ -213,7 +202,6 @@ export const votePost = async (req, res) => {
         }
         console.log(`[votePost] Found Post (title: ${post.postTitle}) and User (email: ${user.email}).`);
 
-
         if (!post.upVote) { post.upVote = []; }
         if (!post.downVote) { post.downVote = []; }
 
@@ -222,91 +210,83 @@ export const votePost = async (req, res) => {
 
         console.log(`[votePost] Initial vote state for user ${userId}: upIndex=${upIndex}, downIndex=${downIndex}`);
 
+        let userUpdate = {}; 
+        let postUpdate = {}; 
+
         if (value === 'upVote') {
             console.log(`[votePost] Handling an UPVOTE action.`);
             if (downIndex !== -1) {
-                post.downVote = post.downVote.filter((id) => id !== String(userId));
+                postUpdate.$pull = { downVote: userId };
                 console.log(`[votePost] Removed existing downvote from user ${userId}.`);
             }
 
-            if (upIndex === -1) { 
-                post.upVote.push(userId);
+            if (upIndex === -1) {
+                postUpdate.$addToSet = { ...postUpdate.$addToSet, upVote: userId }; 
                 console.log(`[votePost] User ${userId} successfully UPVOTED post ${_id}.`);
 
+                if (post.userId.toString() !== userId) { 
+                    userUpdate.$inc = { likesGivenCount: 1, dailyUpvotesCount: 1 };
+                    console.log(`[votePost] User ${user.email} likesGivenCount/dailyUpvotesCount incremented.`);
+                    const updatedUser = await User.findByIdAndUpdate(userId, userUpdate, { new: true });
 
-                if (post.userId.toString() !== userId) {
-
-                    user.likesGivenCount = (user.likesGivenCount || 0) + 1;
-
-
-                    user.dailyUpvotesCount = (user.dailyUpvotesCount || 0) + 1;
-                    console.log(`[votePost] User ${user.email} dailyUpvotesCount: ${user.dailyUpvotesCount}`);
-
-
-                    if (user.dailyUpvotesCount >= 5) {
+                    if (updatedUser.dailyUpvotesCount >= 5) {
                         await completeTaskByCriteria(userId, 'upvote_5_posts');
                         console.log(`[votePost] Checked 'upvote_5_posts' for user ${userId}.`);
                     } else {
-                        console.log(`[votePost] User ${userId} needs ${5 - user.dailyUpvotesCount} more upvotes for 'upvote_5_posts' task.`);
+                        console.log(`[votePost] User ${userId} needs ${5 - updatedUser.dailyUpvotesCount} more upvotes for 'upvote_5_posts' task.`);
                     }
-
-                    const xpAwarded = 2; 
-                    await addXP(userId, xpAwarded); 
+                    const xpAwarded = 2;
+                    await addXP(userId, xpAwarded);
                     console.log(`[votePost] Awarded ${xpAwarded} XP to user ${userId}.`);
-
-
-                    if (post.upVote.length >= 50) { 
-                        console.log(`[votePost] Post reached 50 upvotes. Checking 'post_liked_by_others' achievement for owner ${post.userId}.`);
-                        await checkAndAwardAchievements(post.userId, 'post_liked_by_others');
-                    }
-
-
-                    if (post.userId.toString() !== userId) { 
-                        await createNotification(
-                            post.userId, 
-                            userId, 
-                            'upvote', 
-                            `${user.username} upvoted your post: "${post.postTitle.substring(0, 50)}..."`, 
-                            `/posts/${post._id}` 
-                        );
-                        console.log(`[votePost] Created upvote notification for post owner ${post.userId}.`);
-                    }
-
-
                 } else {
                     console.log(`[votePost] User ${userId} upvoted their own post. No XP or daily task completion for this action.`);
                 }
-            } else { 
-                post.upVote = post.upVote.filter((id) => id !== String(userId));
+            } else {
+                postUpdate.$pull = { ...postUpdate.$pull, upVote: userId };
                 console.log(`[votePost] User ${userId} UNDID their upvote on post ${_id}.`);
-
                 if (post.userId.toString() !== userId) {
-                    user.likesGivenCount = Math.max(0, (user.likesGivenCount || 0) - 1);
+                    userUpdate.$inc = { ...userUpdate.$inc, likesGivenCount: -1 };
                 }
             }
         } else if (value === 'downVote') {
             console.log(`[votePost] Handling a DOWNVOTE action.`);
-            if (upIndex !== -1) { 
-                post.upVote = post.upVote.filter((id) => id !== String(userId));
+            if (upIndex !== -1) {
+                postUpdate.$pull = { upVote: userId };
                 console.log(`[votePost] Removed existing upvote from user ${userId}.`);
-
                 if (post.userId.toString() !== userId) {
-                    user.likesGivenCount = Math.max(0, (user.likesGivenCount || 0) - 1);
+                    userUpdate.$inc = { likesGivenCount: -1 }; 
                 }
             }
 
-            if (downIndex === -1) { 
-                post.downVote.push(userId);
+            if (downIndex === -1) {
+                postUpdate.$addToSet = { ...postUpdate.$addToSet, downVote: userId };
                 console.log(`[votePost] User ${userId} successfully DOWNVOTED post ${_id}.`);
-            } else { 
-                post.downVote = post.downVote.filter((id) => id !== String(userId));
+            } else {
+                postUpdate.$pull = { ...postUpdate.$pull, downVote: userId };
                 console.log(`[votePost] User ${userId} UNDID their downvote on post ${_id}.`);
             }
         }
 
-        const updatedPost = await Posts.findByIdAndUpdate(_id, post, { new: true });
-        await user.save(); 
-        console.log(`[votePost] Post ${_id} updated in DB. Final upVote count: ${updatedPost.upVote.length}, downVote count: ${updatedPost.downVote.length}.`);
+        const updatedPost = await Posts.findByIdAndUpdate(_id, postUpdate, { new: true });
+        if (Object.keys(userUpdate).length > 0) { 
+            await User.findByIdAndUpdate(userId, userUpdate);
+        }
+        if (updatedPost.upVote.length >= 50 && post.userId.toString() !== userId) {
+            console.log(`[votePost] Post reached 50 upvotes. Checking 'post_liked_by_others' achievement for owner ${updatedPost.userId}.`);
+            await checkAndAwardAchievements(updatedPost.userId, 'post_liked_by_others');
+        }
+
+        if (value === 'upVote' && upIndex === -1 && post.userId.toString() !== userId) {
+            await createNotification(
+                post.userId, 
+                userId, 
+                'upvote', 
+                `${user.username} upvoted your post: "${post.postTitle.substring(0, 50)}..."`, 
+                `/posts/${post._id}` 
+            );
+            console.log(`[votePost] Created upvote notification for post owner ${post.userId}.`);
+        }
+
         res.status(200).json(updatedPost);
         console.log(`--- [votePost] END ---`);
 
@@ -320,12 +300,17 @@ export const votePost = async (req, res) => {
 export const pinPost = async (req, res) => {
     console.log(`\n--- [pinPost] START ---`);
     const { id: postId } = req.params;
-    const userId = req.userId; 
-    console.log(`[pinPost] Request for Post ID: ${postId} by User ID: ${userId}`);
+    const currentUserId = req.userId; 
+    console.log(`[pinPost] Request for Post ID: ${postId} by User ID: ${currentUserId}`);
 
     if (!mongoose.Types.ObjectId.isValid(postId)) {
         console.error(`[pinPost] ERROR: Invalid Post ID: ${postId}`);
         return res.status(404).send('Post unavailable...');
+    }
+
+    if (currentUserId !== process.env.ADMIN_ID) {
+        console.warn(`[pinPost] Unauthorized: User ${currentUserId} is not the Admin (${process.env.ADMIN_ID}).`);
+        return res.status(403).json({ message: "Only the administrator can pin or unpin posts." });
     }
 
     try {
@@ -334,51 +319,13 @@ export const pinPost = async (req, res) => {
             console.error(`[pinPost] Post not found for ID: ${postId}.`);
             return res.status(404).json({ message: "Post not found" });
         }
-        console.log(`[pinPost] Found Post (title: ${post.postTitle}).`);
+        console.log(`[pinPost] Found Post (title: ${post.postTitle}, current pinned status: ${post.pinned}).`);
 
-        if (post.userId.toString() !== userId) {
-            console.warn(`[pinPost] Unauthorized: User ${userId} tried to pin post ${postId} which belongs to ${post.userId}.`);
-            return res.status(403).json({ message: "You can only pin your own posts." });
-        }
+        post.pinned = !post.pinned;
 
-        const user = await User.findById(userId);
-        if (!user) {
-            console.error(`[pinPost] User not found for ID: ${userId}.`);
-            return res.status(404).json({ message: "User not found." });
-        }
-        console.log(`[pinPost] Found User: ${user.email}.`);
+        await post.save();
 
-
-        const pinTaskTemplate = await DailyTaskTemplate.findOne({ criteria: 'pin_post', type: 'daily' }); 
-        const cost = pinTaskTemplate ? Math.abs(pinTaskTemplate.xpReward) : 10; 
-        console.log(`[pinPost] Pin cost for 'pin_post' task template: ${cost} XP.`);
-
-        if (!post.pinned) { 
-            console.log(`[pinPost] Attempting to PIN post ${postId}. Current user XP: ${user.xp}. Required: ${cost}`);
-            if (user.xp < cost) {
-                console.warn(`[pinPost] Not enough XP for user ${userId}. Required: ${cost}, Has: ${user.xp}`);
-                return res.status(400).json({ message: `Not enough XP to pin. Requires ${cost} XP.` });
-            }
-            user.xp -= cost; 
-            post.pinned = true;
-            console.log(`[pinPost] Post ${postId} marked as pinned. User ${userId} new XP: ${user.xp}`);
-
-
-
-
-
-
-        } else { 
-            console.log(`[pinPost] Attempting to UNPIN post ${postId}.`);
-            post.pinned = false; 
-
-            console.log(`[pinPost] Post ${postId} marked as unpinned.`);
-        }
-
-        await user.save(); 
-        await post.save(); 
-
-        res.status(200).json({ message: `Post ${post.pinned ? 'pinned' : 'unpinned'} successfully. Your XP: ${user.xp}` });
+        res.status(200).json({ message: `Post ${post.pinned ? 'pinned' : 'unpinned'} successfully.`, pinned: post.pinned });
         console.log(`--- [pinPost] END ---`);
     } catch (error) {
         console.error(`[pinPost] FATAL ERROR pinning/unpinning post ${postId}:`, error);
@@ -391,9 +338,8 @@ export const boostUpvotes = async (req, res) => {
     console.log(`\n--- [boostUpvotes] START ---`);
     const { id } = req.params;
     const { amount } = req.body;
-    const adminId = req.userId;
+    const adminId = req.userId; 
     console.log(`[boostUpvotes] Request to boost post ID: ${id} by ${amount} upvotes from Admin ID: ${adminId}`);
-
 
     if (adminId !== process.env.ADMIN_ID) {
         console.warn(`[boostUpvotes] Unauthorized attempt: User ${adminId} is not the Admin (${process.env.ADMIN_ID}).`);
@@ -412,16 +358,12 @@ export const boostUpvotes = async (req, res) => {
         }
         console.log(`[boostUpvotes] Found Post (title: ${post.postTitle}).`);
 
-
         if (!post.upVote) {
             post.upVote = [];
         }
 
-
-        for (let i = 0; i < amount; i++) {
-            post.upVote.push(new mongoose.Types.ObjectId()); 
-        }
-        console.log(`[boostUpvotes] Added ${amount} fake upvotes. Total now: ${post.upVote.length}.`);
+        const newFakeUpvotes = Array.from({ length: amount }, () => new mongoose.Types.ObjectId());
+        post.upVote.push(...newFakeUpvotes);
 
         await post.save();
         res.status(200).json({ message: `Boosted ${amount} upvotes. Post now has ${post.upVote.length} upvotes.` });
@@ -434,12 +376,11 @@ export const boostUpvotes = async (req, res) => {
 };
 
 
-
 export const addComment = async (req, res) => {
     console.log(`\n--- [addComment] START ---`);
-    const { id: postId } = req.params; 
-    const { commentBody, userCommented, userId } = req.body; 
-    const currentUserId = req.userId; 
+    const { id: postId } = req.params;
+    const { commentBody, userCommented } = req.body;
+    const currentUserId = req.userId;
 
     console.log(`[addComment] Request received for Post ID: ${postId} by User ID: ${currentUserId}`);
 
@@ -453,7 +394,7 @@ export const addComment = async (req, res) => {
     }
 
     try {
-        const post = await Posts.findById(postId);
+        let post = await Posts.findById(postId);
         if (!post) {
             console.error(`[addComment] Post not found for ID: ${postId}.`);
             return res.status(404).json({ message: "Post not found." });
@@ -467,36 +408,37 @@ export const addComment = async (req, res) => {
             commentedOn: new Date().toISOString()
         };
 
-        post.noOfComments = (post.noOfComments || 0) + 1;
-        post.comment.push(newComment);
-        await post.save();
+        const updatedPost = await Posts.findByIdAndUpdate(
+            postId,
+            {
+                $push: { comment: newComment },
+                $inc: { noOfComments: 1 }
+            },
+            { new: true } 
+        );
         console.log(`[addComment] Comment added to post ${postId}.`);
-
 
         const commentingUser = await User.findById(currentUserId);
         if (commentingUser) {
-            commentingUser.commentsCount = (commentingUser.commentsCount || 0) + 1;
-            await commentingUser.save();
-            console.log(`[addComment] User ${commentingUser.email} commentsCount updated to ${commentingUser.commentsCount}.`);
+            await User.findByIdAndUpdate(currentUserId, { $inc: { commentsCount: 1 } });
+            const userAfterCommentUpdate = await User.findById(currentUserId); 
+            console.log(`[addComment] User ${userAfterCommentUpdate.email} commentsCount updated to ${userAfterCommentUpdate.commentsCount}.`);
             await checkAndAwardAchievements(currentUserId, 'add_comment');
             console.log(`[addComment] Checked achievements for user ${currentUserId} after adding comment.`);
         } else {
             console.warn(`[addComment] Commenting user not found for ID: ${currentUserId}. Gamification skipped.`);
         }
 
-
         if (post.userId.toString() !== currentUserId) { 
             await createNotification(
-                post.userId, 
-                currentUserId, 
-                'comment', 
+                post.userId,
+                currentUserId,
+                'comment',
                 `${userCommented} commented on your post: "${post.postTitle.substring(0, 50)}..."`, 
-                `/posts/${postId}` 
+                `/posts/${postId}`
             );
             console.log(`[addComment] Created comment notification for post owner ${post.userId}.`);
         }
-
-
 
         const mentionedUsernames = extractMentions(commentBody);
         console.log(`[addComment] Extracted mentions from comment:`, mentionedUsernames);
@@ -506,14 +448,13 @@ export const addComment = async (req, res) => {
             console.log(`[addComment] Found mentioned users from comment:`, mentionedUsers.map(u => u.username));
 
             for (const mentionedUser of mentionedUsers) {
-
                 if (mentionedUser._id.toString() !== currentUserId && mentionedUser._id.toString() !== post.userId.toString()) {
                     await createNotification(
-                        mentionedUser._id, 
-                        currentUserId, 
-                        'mention', 
-                        `You were mentioned by ${userCommented} in a comment on "${post.postTitle.substring(0, 50)}..."`, 
-                        `/posts/${postId}` 
+                        mentionedUser._id,
+                        currentUserId,
+                        'mention',
+                        `You were mentioned by ${userCommented} in a comment on "${post.postTitle.substring(0, 50)}..."`,
+                        `/posts/${postId}`
                     );
                     console.log(`[addComment] Created mention notification for ${mentionedUser.username} from comment.`);
                 } else {
@@ -522,8 +463,7 @@ export const addComment = async (req, res) => {
             }
         }
 
-
-        res.status(200).json(post);
+        res.status(200).json(updatedPost);
         console.log(`--- [addComment] END ---`);
     } catch (error) {
         console.error(`[addComment] ERROR adding comment to post ${postId}:`, error);
@@ -535,9 +475,8 @@ export const addComment = async (req, res) => {
 export const deleteComment = async (req, res) => {
     console.log(`\n--- [deleteComment] START ---`);
     const { id: postId, commentId } = req.params;
-    const userId = req.userId; 
-
-    console.log(`[deleteComment] Request to delete comment ${commentId} from Post ${postId} by User ${userId}`);
+    const currentUserId = req.userId;
+    console.log(`[deleteComment] Request to delete comment ${commentId} from Post ${postId} by User ${currentUserId}`);
 
     if (!mongoose.Types.ObjectId.isValid(postId) || !mongoose.Types.ObjectId.isValid(commentId)) {
         console.error(`[deleteComment] ERROR: Invalid Post or Comment ID.`);
@@ -551,22 +490,26 @@ export const deleteComment = async (req, res) => {
             return res.status(404).json({ message: "Post not found." });
         }
 
-
         const commentToDelete = post.comment.id(commentId);
         if (!commentToDelete) {
             console.warn(`[deleteComment] Comment ${commentId} not found in post ${postId}.`);
             return res.status(404).json({ message: "Comment not found." });
         }
-
-
-        if (commentToDelete.userId.toString() !== userId && post.userId.toString() !== userId) {
-            console.warn(`[deleteComment] Unauthorized: User ${userId} tried to delete comment ${commentId} (owned by ${commentToDelete.userId}) from post ${postId} (owned by ${post.userId}).`);
+        if (commentToDelete.userId.toString() !== currentUserId &&
+            post.userId.toString() !== currentUserId &&
+            currentUserId !== process.env.ADMIN_ID) {
+            console.warn(`[deleteComment] Unauthorized: User ${currentUserId} tried to delete comment ${commentId} (owned by ${commentToDelete.userId}) from post ${postId} (owned by ${post.userId}).`);
             return res.status(403).json({ message: "You are not authorized to delete this comment." });
         }
 
-        post.comment.pull(commentId); 
-        post.noOfComments = Math.max(0, (post.noOfComments || 0) - 1); 
-        await post.save();
+        await Posts.findByIdAndUpdate(
+            postId,
+            {
+                $pull: { comment: { _id: commentId } },
+                $inc: { noOfComments: -1 }
+            },
+            { new: true }
+        );
 
         console.log(`[deleteComment] Comment ${commentId} successfully deleted from post ${postId}.`);
         res.status(200).json({ message: "Comment deleted successfully." });
@@ -581,7 +524,7 @@ export const deleteComment = async (req, res) => {
 
 export const searchPostsByTitle = async (req, res) => {
     console.log(`\n--- [searchPostsByTitle] START ---`);
-    const { q } = req.query; 
+    const { q } = req.query;
     console.log(`[searchPostsByTitle] Search query received: "${q}"`);
 
     if (!q || q.trim().length === 0) {
@@ -606,7 +549,7 @@ export const searchPostsByTitle = async (req, res) => {
 
 export const getPostSuggestions = async (req, res) => {
     console.log(`\n--- [getPostSuggestions] START ---`);
-    const { q } = req.query; 
+    const { q } = req.query;
     console.log(`[getPostSuggestions] Suggestion query received: "${q}"`);
 
     if (!q || q.trim().length < 2) {

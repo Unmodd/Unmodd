@@ -1,21 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux"; // Import useDispatch here
 import { FaAngleUp } from "react-icons/fa6";
 import { BiCommentDots } from "react-icons/bi";
 import { FaFire, FaClock } from "react-icons/fa";
 import moment from "moment";
 import axios from "axios";
+import { io } from "socket.io-client";
+
 import "./Memes.css";
 import BannerScroller from '../../components/HomeMainbar/BannerScroller';
-import { useDispatch } from 'react-redux';
-import { togglePinPost, boostUpvotes } from '../../actions/post'; 
-import { io } from "socket.io-client";
-import GroupDock from '../../components/GroupDock';
-import CryptoTicker from '../../components/CryptoTicker';
-import ChatWindow from '../../components/Chat/ChatWindow';
-import '../../components/Chat/Chat.css';
-
+import { togglePinPost, boostUpvotes } from '../../actions/post';
+import GroupDock from '../../components/GroupDock'; 
+import CryptoTicker from '../../components/CryptoTicker'; 
+import ChatWindow from '../../components/Chat/ChatWindow'; 
+import '../../components/Chat/Chat.css'; 
 
 const Memes = () => {
     const [selectedUser, setSelectedUser] = useState(null);
@@ -29,48 +28,33 @@ const Memes = () => {
 
     const postsList = useSelector((state) => state.postsReducer);
 
-
     const CATEGORY_NAME = "Memes";
 
-
-    const [currentFilter, setCurrentFilter] = useState('hot'); 
-
-
-
-
-
-
+    const [currentFilter, setCurrentFilter] = useState('hot');
 
     const filteredByCategoryPosts = postsList.data
         ? postsList.data.filter(post => post.category === CATEGORY_NAME)
         : [];
 
-
     const sortedAndFilteredPosts = filteredByCategoryPosts.length > 0
         ? [...filteredByCategoryPosts].sort((a, b) => {
-
-                if (a.pinned && !b.pinned) return -1;
-                if (!a.pinned && b.pinned) return 1;
-
-                if (currentFilter === 'new') {
-
-                    return new Date(b.postedOn) - new Date(a.postedOn);
-                } else { 
-
-                    const scoreA = a.upVote.length - a.downVote.length;
-                    const scoreB = b.upVote.length - b.downVote.length;
-                    return scoreB - scoreA;
-                }
-            })
-        : []; 
-
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+            if (currentFilter === 'new') {
+                return new Date(b.postedOn) - new Date(a.postedOn);
+            } else {
+                const scoreA = a.upVote.length - a.downVote.length;
+                const scoreB = b.upVote.length - b.downVote.length;
+                return scoreB - scoreA;
+            }
+        })
+        : [];
 
     const checkAuthAndNavigateToCreatePost = () => {
         if (!user) {
             alert("Login or signup to create a post");
             navigate("/Auth");
         } else {
-
             navigate(`/CreatePost/${CATEGORY_NAME.toLowerCase()}`);
         }
     };
@@ -78,27 +62,6 @@ const Memes = () => {
     const handleTogglePin = (id) => {
         dispatch(togglePinPost(id));
     };
-
-
-
-    const handlePinPost = async (postId) => {
-            try {
-                console.log("Token:", user?.token);
-                await axios.post(
-                    `${process.env.REACT_APP_BASE_URL}/posts/pin/${postId}`,
-                    {},
-                    {
-                        headers: {
-                            Authorization: `Bearer ${user.token}`,
-                        },
-                    }
-                );
-                window.location.reload(); 
-            } catch (err) {
-                console.error("Failed to pin post", err);
-            }
-        };
-
 
     const [globalMessages, setGlobalMessages] = useState([]);
     const [globalChatInput, setGlobalChatInput] = useState("");
@@ -115,7 +78,6 @@ const Memes = () => {
         const senderId = user?.result?._id;
         const senderName = user?.result?.name || "Anonymous";
 
-
         socket.current.emit("global message", {
             userId: senderId,
             userName: senderName,
@@ -126,12 +88,13 @@ const Memes = () => {
     };
 
     useEffect(() => {
+
         socket.current = io(process.env.REACT_APP_BASE_URL);
 
         axios.get(`${process.env.REACT_APP_BASE_URL}/api/globalchat/history`)
             .then(response => {
                 const formattedMessages = response.data.map(msg => ({
-                    id: msg._id, 
+                    id: msg._id,
                     senderName: msg.senderName,
                     text: msg.text,
                     timestamp: new Date(msg.timestamp)
@@ -141,21 +104,18 @@ const Memes = () => {
             .catch(error => {
                 console.error("Error fetching global chat history:", error);
             });
-
         socket.current.on("global message", (msg) => {
             setGlobalMessages((prev) => {
-
                 const isDuplicate = prev.some(m => m.id === msg._id);
                 if (isDuplicate) {
-                    return prev; 
+                    return prev;
                 }
+                const senderDisplay = user?.result?._id === msg.userId ? "You" : msg.userName || msg.senderName;
 
-
-                const senderDisplay = user?.result?._id === msg.senderId ? "You" : msg.senderName;
                 return [
                     ...prev,
                     {
-                        id: msg._id, 
+                        id: msg._id,
                         senderName: senderDisplay,
                         text: msg.text,
                         timestamp: new Date(msg.timestamp)
@@ -163,12 +123,10 @@ const Memes = () => {
                 ];
             });
         });
-
         return () => {
             socket.current.disconnect();
         };
     }, [user?.result?._id]);
-
 
     useEffect(() => {
         globalMessagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -194,7 +152,6 @@ const Memes = () => {
                                 <FaClock className="filter-icon" /><span>New</span>
                             </div>
                         </div>
-                        {}
                         <button onClick={checkAuthAndNavigateToCreatePost} className="create-btn">Create Post</button>
                     </div>
 
@@ -208,19 +165,19 @@ const Memes = () => {
                                     sortedAndFilteredPosts.map((post) => (
                                         <div key={post._id} className="display-post-container">
                                             <div className="votes-section">
-                                                {}
                                                 <FaAngleUp className="vote-icon" />
                                                 <p className="vote-count">
                                                     {post.upVote.length - post.downVote.length}
                                                 </p>
                                             </div>
                                             {isAdmin && (
-                                                <div className="admin-actions"> {}
+                                                <div className="admin-actions">
                                                     <input
                                                         type="number"
                                                         value={boostAmount}
                                                         onChange={(e) => setBoostAmount(Number(e.target.value))}
                                                         className="border px-2 py-1 mr-2 rounded"
+                                                        placeholder="Boost amount"
                                                     />
                                                     <button
                                                         onClick={() => dispatch(boostUpvotes(post._id, boostAmount))}
@@ -230,7 +187,7 @@ const Memes = () => {
                                                     </button>
                                                     <button
                                                         onClick={() => handleTogglePin(post._id)}
-                                                        className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-1 rounded pin-btn ml-2" 
+                                                        className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-1 rounded pin-btn ml-2"
                                                     >
                                                         {post.pinned ? 'Unpin' : 'Pin'}
                                                     </button>
@@ -250,12 +207,11 @@ const Memes = () => {
                                                     </h3>
                                                 </Link>
                                                 <p className="post-description">
-                                                    {post.postBody ? post.postBody.substring(0, 100) + "..." : ""} {}
+                                                    {post.postBody ? post.postBody.substring(0, 100) + "..." : ""}
                                                 </p>
                                                 {post.mediaUrls && post.mediaUrls.length > 0 && (
                                                     <div className="post-media-preview">
-                                                        {}
-                                                        {post.mediaUrls[0].includes('.mp4') || post.mediaUrls[0].includes('.webm') ? (
+                                                        {post.mediaUrls[0].includes('.mp4') || post.mediaUrls[0].includes('.webm') || post.mediaUrls[0].includes('.gif') ? ( // Added .gif for memes
                                                             <video src={post.mediaUrls[0]} controls className="media-thumbnail" />
                                                         ) : (
                                                             <img src={post.mediaUrls[0]} alt="Post media" className="media-thumbnail" />
@@ -263,13 +219,13 @@ const Memes = () => {
                                                     </div>
                                                 )}
                                                 <div className="display-tags-time">
-                                                        <div className="display-tags">
+                                                    <div className="display-tags">
                                                         {post.postTags && post.postTags.map((tag) => (
                                                             <p key={tag}>
-                                                            {tag.length > 20 ? `${tag.substring(0, 20)}...` : tag}
+                                                                {tag.length > 20 ? `${tag.substring(0, 20)}...` : tag}
                                                             </p>
                                                         ))}
-                                                        </div>
+                                                    </div>
                                                     <div className="comments-section">
                                                         <BiCommentDots className="comment-icon" />
                                                         <p className="comment-count">{post.noOfComments}</p>
@@ -285,11 +241,10 @@ const Memes = () => {
                         )}
                     </div>
                 </div>
-                {}
+
                 <div className="global-chat">
                     <h3>Global Chat</h3>
                     <CryptoTicker />
-
                     {selectedUser && (
                         <ChatWindow
                             user={selectedUser}
@@ -315,8 +270,6 @@ const Memes = () => {
                         <button onClick={sendGlobalMessage}>Send</button>
                     </div>
                 </div>
-                {}
-                {}
             </div>
         </div>
     );
