@@ -42,6 +42,8 @@ const io = new Server(httpServer, {
     }
 });
 
+const userSocketMap = new Map();
+
 // --- Express Middleware ---
 app.use(express.json({ limit: '30mb', extended: true }));
 app.use(express.urlencoded({ limit: '30mb', extended: true }));
