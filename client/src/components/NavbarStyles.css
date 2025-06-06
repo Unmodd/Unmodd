@@ -1,0 +1,135 @@
+.NavbarItems{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    padding: 0 30px;
+    background-color: #222222;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    width: 95%;
+    height: 80px;
+    border-radius: 13px;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+.logo {
+    color: white;
+    justify-self: start;
+    cursor: pointer;
+}
+
+.nav-menu{
+    display: grid;
+    grid-template-columns: repeat(6, auto);
+    grid-gap: 10px;
+    list-style: none;
+    align-items: center;
+    text-align: center;
+    justify-content: end;
+
+}
+
+.nav-links{
+    text-decoration: none;
+    color: white;
+    padding: 0.7rem 1rem;
+    white-space: nowrap;
+}
+
+.nav-links:hover{
+    background: rgb(0, 0, 0);
+    border-radius: 13px;
+    transition: all 0.2s ease-in-out;
+    color: rgb(17, 248, 214);
+}
+
+.fa-bars{
+    color: #ffffff;
+}
+.fa-times{
+    color: #ffffff;
+}
+
+.menu-icons{
+    display: none;
+}
+
+.nav-links-mobile{
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
+    background-color: #11F9D7;
+    border-radius: 13px;
+    text-decoration: none;
+    font-weight: 700px;
+    color: #000000;
+}
+
+.nav-links-mobile:hover{
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
+    background-color: #ffffff;
+    border-radius: 13px;
+    text-decoration: none;
+    font-weight: 700px;
+    color: #000000;
+}
+
+@media screen and (max-width: 850px) {
+    .NavbarItems{
+        z-index: 99;
+    }
+
+    .nav-menu{
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        background: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        backdrop-filter: blur(4px);
+        border-radius: 13px;
+        width: 100%;
+        height: auto;
+        position: absolute;
+        top: 0;
+        left: -110%;
+        align-items: stretch;
+        padding: 80px 0 30px 0;
+        margin: 0;
+        z-index: -1;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .nav-menu.active{
+        left: 0%;
+    }
+
+    .nav-links{
+        display: block;
+        widows: 100%;
+        padding: 2rem 0;
+        color: #222222;
+
+    }
+
+    .nav-links:hover{
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(20px);
+    }
+
+    .menu-icons {
+        display: block;
+    }
+
+    .nav-links-mobile{
+        padding: 1.5rem;
+        display: block;
+        text-align: center;
+        font-size: 1.3rem;
+        font-weight: bold;
+        width: 80%;
+        margin: auto;
+    }
+}

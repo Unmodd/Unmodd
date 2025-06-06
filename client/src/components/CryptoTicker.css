@@ -1,0 +1,155 @@
+
+
+
+
+
+@keyframes borderPulseSubtle {
+    0% { border-color: rgba(0, 191, 255, 0.2); }
+    50% { border-color: rgba(0, 191, 255, 0.4); }
+    100% { border-color: rgba(0, 191, 255, 0.2); }
+}
+
+
+@keyframes flashGreen {
+    0% { background-color: rgba(0, 255, 174, 0.3); } 
+    100% { background-color: transparent; }
+}
+
+@keyframes flashRed {
+    0% { background-color: rgba(255, 77, 77, 0.3); } 
+    100% { background-color: transparent; }
+}
+
+
+@keyframes shimmerEffect {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+
+.crypto-item {
+    display: inline-flex;
+    align-items: center;
+    position: relative; 
+    overflow: hidden; 
+
+    background: rgba(18, 18, 18, 0.4); 
+    backdrop-filter: blur(15px) saturate(180%); 
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08); 
+    border-radius: 50px; 
+    padding: 12px 25px; 
+    margin-right: 20px; 
+    margin-bottom: 20px;
+    margin-top: 20px;
+
+    font-size: 1.05rem; 
+    font-weight: 500;
+    color: #E0E0E0; 
+    
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.01); 
+    
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
+    cursor: pointer;
+    user-select: none; 
+}
+
+
+.crypto-item:hover {
+    transform: translateY(-5px) scale(1.02); 
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.02); 
+    border-color: rgba(0, 191, 255, 0.3); 
+    animation: borderPulseSubtle 2s infinite ease-in-out; 
+}
+
+
+.crypto-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50px; 
+    pointer-events: none; 
+    z-index: 1; 
+    background-color: transparent; 
+    transition: background-color 0.5s ease-out; 
+}
+
+
+.crypto-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%; 
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.05) 30%, 
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.05) 70%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: translateX(-100%); 
+    pointer-events: none;
+    z-index: 2; 
+    opacity: 0; 
+    transition: opacity 0.3s ease;
+}
+
+.crypto-item:hover::before {
+    opacity: 1; 
+    animation: shimmerEffect 1.5s ease-in-out forwards; 
+}
+
+
+.crypto-symbol {
+    font-weight: 700;
+    margin-right: 8px; 
+    color: #F0F0F0; 
+    letter-spacing: 0.02em; 
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.05); 
+}
+
+.crypto-price {
+    margin-right: 10px; 
+    font-weight: 600;
+    color: #fff; 
+    font-family: 'Roboto Mono', monospace; 
+    text-shadow: 0 0 5px rgba(0, 191, 255, 0.1); 
+}
+
+
+.crypto-change {
+    font-weight: 600;
+    margin-left: 6px; 
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.95rem; 
+    display: inline-flex; 
+    align-items: center;
+    gap: 4px; 
+}
+
+
+.positive {
+    color: #00FFBE; 
+    text-shadow: 0 0 4px rgba(0, 255, 190, 0.4); 
+}
+
+
+.negative {
+    color: #FF5A5A; 
+    text-shadow: 0 0 4px rgba(255, 90, 90, 0.4); 
+}
+
+
+.crypto-item.price-up::after {
+    animation: flashGreen 0.7s ease-out; 
+}
+
+.crypto-item.price-down::after {
+    animation: flashRed 0.7s ease-out; 
+}
