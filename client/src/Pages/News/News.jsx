@@ -244,6 +244,14 @@ const News = () => {
                 <div className="global-chat">
                     <h3>Global Chat</h3>
                     <CryptoTicker />
+                    <div className="chat-messages">
+                        {globalMessages.map((msg) => (
+                            <div key={msg.id} className={`chat-message ${user?.result?._id === msg.userId ? "own" : ""}`}>
+                                <span className="chat-user">{msg.senderName}:</span> {msg.text}
+                            </div>
+                        ))}
+                        <div ref={globalMessagesEndRef} />
+                    </div>
                     <div className="chat-input-area">
                         <input
                             type="text"

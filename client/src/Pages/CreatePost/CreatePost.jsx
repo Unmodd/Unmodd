@@ -7,10 +7,6 @@ import { createPost } from '../../actions/post';
 
 
 import { MentionsInput, Mention } from 'react-mentions';
-import defaultStyle from './defaultStyle'; 
-import mentionStyle from './mentionStyle'; 
-
-
 
 
 const fetchUsers = async (query) => {
@@ -165,21 +161,19 @@ const CreatePost = () => {
                     <div className="form-group">
                         <label htmlFor="postBody">
                             <h4>Description <span className="required-star">*</span></h4>
-                            <MentionsInput
-                                value={postBody}
-                                onChange={(e) => setPostBody(e.target.value)}
-                                style={defaultStyle} 
-                                placeholder="Share your thoughts, insights, or story here. Type @ to mention a user!"
-                                className="description" 
-                            >
-                                <Mention
-                                    trigger="@"
-                                    data={onMentionsAdd} 
-                                    style={mentionStyle} 
-                                    displayTransform={(id, display) => `@${display}`} 
-                                    appendSpaceOnAdd={true} 
-                                />
-                            </MentionsInput>
+                        <MentionsInput
+                            value={postBody}
+                            onChange={(e) => setPostBody(e.target.value)}
+                            placeholder="Share your thoughts, insights, or story here. Type @ to mention a user!"
+                            className="description"
+                        >
+                            <Mention
+                                trigger="@"
+                                data={onMentionsAdd}
+                                displayTransform={(id, display) => `@${display}`}
+                                appendSpaceOnAdd={true}
+                            />
+                        </MentionsInput>
                         </label>
                     </div>
 

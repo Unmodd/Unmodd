@@ -20,21 +20,6 @@ const UserDock = ({ currentUserId, onSelectUser }) => {
 
     fetchUsers();
   }, [currentUserId]);
-
-  return (
-    <div className="user-dock">
-      {users.map(user => (
-        <div
-          key={user._id}
-          className="user-item"
-          onClick={() => onSelectUser(user)}
-        >
-          <img src={user.avatar || '/default-avatar.png'} alt={user.name} />
-          <span>{user.name}</span>
-        </div>
-      ))}
-    </div>
-  );
 };
 
 export default UserDock;

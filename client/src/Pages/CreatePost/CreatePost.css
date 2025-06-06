@@ -1,7 +1,5 @@
-
-
 :root {
-    
+    /* Base Colors - Slightly softer darks, richer blue */
     --primary-blue-navbar: #007BFF;
     --secondary-blue-navbar: #00BFFF;
     --dark-background-navbar: rgba(15, 15, 15, 0.7);
@@ -10,52 +8,64 @@
     --text-light-navbar: #e0e0e0;
     --text-white-navbar: #FFFFFF;
 
-    
-    --create-bg-dark: #0d1117; 
-    --create-card-bg: rgba(20, 25, 35, 0.85); 
-    --create-text-main: #e0e0e0; 
-    --create-text-label: #c0c0c0; 
-    --create-text-placeholder: #a0a0a0; 
+    /* Create Post Specific Colors (harmonized with navbar) */
+    --create-bg-dark: #0d1117;
+    --create-card-bg: rgba(20, 25, 35, 0.85); /* Not directly used in final structure, but good to keep */
+    --create-text-main: #e0e0e0;
+    --create-text-label: #c0c0c0;
+    --create-text-placeholder: #a0a0a0;
+
+    /* New for MentionsInput - based on your existing design */
+    --mentions-input-bg: rgba(255, 255, 255, 0.1);
+    --mentions-input-border: rgba(255, 255, 255, 0.2);
+    --mentions-input-focus-bg: rgba(255, 255, 255, 0.2);
+    --mentions-input-focus-border: var(--primary-blue-navbar);
+    --mentions-input-focus-shadow: rgba(0, 123, 255, 0.3);
+
+    --mentions-list-bg: rgba(25, 25, 25, 0.95); /* Darker, slightly transparent for suggestions */
+    --mentions-list-border: rgba(255, 255, 255, 0.15);
+    --mentions-item-hover-bg: rgba(0, 123, 255, 0.2); /* Highlight for mentions */
+    --mentions-item-active-bg: rgba(0, 123, 255, 0.35); /* Active highlight */
+    --mentions-highlight-color: var(--secondary-blue-navbar); /* Color for mentioned text */
 }
 
-
-
+/* --- Base Styles --- */
 body {
-    font-family: 'Inter', sans-serif; 
-    color: var(--create-text-main); 
-    background-color: var(--create-bg-dark); 
-    margin: 0; 
-    padding: 0; 
-    box-sizing: border-box; 
-    -webkit-font-smoothing: antialiased; 
+    font-family: 'Inter', sans-serif;
+    color: var(--create-text-main);
+    background-color: var(--create-bg-dark);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-
-.create-post-wrapper {
+/* --- Create Post Wrapper & Container --- */
+.create-post-page { /* Changed from .create-post-wrapper for consistency with your JSX */
     min-height: 100vh;
-    padding: 100px 20px; 
+    padding: 100px 20px;
     display: flex;
-    justify-content: center; 
-    align-items: center; 
-    
-
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box; /* Ensure padding doesn't cause overflow */
 }
 
 .create-post-container {
-    max-width: 700px; 
+    max-width: 700px;
     width: 100%;
     margin: 0 auto;
-    padding-top: 50px;
-    background: var(--dark-background-navbar); 
-    backdrop-filter: blur(10px) saturate(180%); 
-    -webkit-backdrop-filter: blur(10px) saturate(180%); 
-    border-radius: 18px; 
-    border: 1px solid var(--border-color-navbar); 
-    
-    box-shadow: 0 8px 30px var(--shadow-color-navbar),
-                0 0 60px rgba(0, 123, 255, 0.1);
-    animation: fadeInScale 0.6s ease-out forwards; 
+    padding: 50px 40px; /* Added horizontal padding */
+    background: var(--dark-background-navbar);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    border-radius: 18px;
+    border: 1px solid var(--border-color-navbar);
+    box-shadow:
+        0 8px 30px var(--shadow-color-navbar),
+        0 0 60px rgba(0, 123, 255, 0.1);
+    animation: fadeInScale 0.6s ease-out forwards;
+    box-sizing: border-box; /* Include padding in width */
 }
 
 @keyframes fadeInScale {
@@ -69,113 +79,208 @@ body {
     }
 }
 
-
-.create-title {
-    color: var(--text-white-navbar); 
+/* --- Titles --- */
+.create-post-title { /* Changed from .create-title for consistency with your JSX */
+    color: var(--text-white-navbar);
     text-align: center;
-    margin-bottom: 35px; 
-    font-size: 2.2rem; 
+    margin-bottom: 35px;
+    font-size: 2.2rem;
     font-weight: 700;
-    letter-spacing: -0.02em; 
-    
+    letter-spacing: -0.02em;
     background: linear-gradient(to right, var(--primary-blue-navbar), var(--secondary-blue-navbar));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 2px 8px rgba(0, 123, 255, 0.3); 
+    text-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
 }
 
 .category-highlight {
-    font-weight: 800; 
-    color: var(--secondary-blue-navbar); 
-    
+    font-weight: 800;
+    color: var(--secondary-blue-navbar);
 }
 
-
+/* --- Form General --- */
 .create-post-form {
     display: flex;
     flex-direction: column;
-    gap: 25px; 
+    gap: 25px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px; 
+    gap: 8px;
 }
 
 .form-group label h4 {
-    margin: 0; 
+    margin: 0;
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--text-light-navbar); 
+    color: var(--text-light-navbar);
 }
 
 .form-group label small {
     font-size: 0.85rem;
-    color: var(--text-light-navbar); 
+    color: var(--text-light-navbar);
     opacity: 0.7;
     margin-left: 5px;
 }
 
-.form-group input,
-.form-group textarea {
+.required-star {
+    color: #ff4d4d; /* Red star for required fields */
+    margin-left: 5px;
+}
+
+/* --- Inputs (Title, Tags, Category) --- */
+.form-group input { /* Targeted specifically for non-MentionsInput */
     width: 100%;
-    padding: 14px 18px; 
+    padding: 14px 18px;
     font-size: 1rem;
-    
-    background: rgba(255, 255, 255, 0.1); 
-    border: 1px solid rgba(255, 255, 255, 0.2); 
-    border-radius: 10px; 
-    color: var(--text-white-navbar); 
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3); 
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: var(--text-white-navbar);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-    -webkit-backdrop-filter: blur(5px); 
+    -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
+    box-sizing: border-box; /* Crucial for consistent width */
 }
 
-.form-group textarea {
-    min-height: 140px; 
-    resize: vertical;
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-    color: #cccccc; 
-    opacity: 1; 
+.form-group input::placeholder {
+    color: #cccccc;
+    opacity: 1;
     transition: color 0.3s ease;
 }
 
-.form-group input:focus::placeholder,
-.form-group textarea:focus::placeholder {
-  color: #e0e0e0; 
+.form-group input:focus::placeholder {
+    color: #e0e0e0;
 }
 
-.form-group input:focus,
-.form-group textarea:focus {
+.form-group input:focus {
     outline: none;
-    border-color: var(--primary-blue-navbar); 
-    background: rgba(255, 255, 255, 0.2); 
-    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(0, 123, 255, 0.3); 
-    color: var(--text-white-navbar); 
+    border-color: var(--primary-blue-navbar);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(0, 123, 255, 0.3);
+    color: var(--text-white-navbar);
 }
 
 .read-only-input {
-    background: rgba(255, 255, 255, 0.05); 
-    border-style: solid; 
-    border-color: rgba(255, 255, 255, 0.1); 
+    background: rgba(255, 255, 255, 0.05);
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.1);
     cursor: default;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); 
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* --- MentionsInput (Description) Styles --- */
+/* This is the wrapper for the MentionsInput component */
+.description {
+    width: 100%;
+    min-height: 140px; /* Controlled by this wrapper */
+    resize: vertical;
+    font-size: 1rem;
+    background: var(--mentions-input-bg);
+    border: 1px solid var(--mentions-input-border);
+    border-radius: 10px;
+    color: var(--text-white-navbar);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    box-sizing: border-box; /* Crucial for consistent width/height */
+    padding: 0; /* MentionsInput has internal padding, control it via its children */
+}
+
+/* Style for the actual input field inside MentionsInput */
+.description__suggestions__input,
+.description__highlighter { /* Apply styles to both input and highlighter */
+    padding: 14px 18px; /* Consistent padding */
+    font-size: 1rem;
+    color: var(--text-white-navbar);
+    /* Remove default background/border/shadow as it's handled by .description wrapper */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    /* Important for `react-mentions` to align content */
+    line-height: 1.5; /* Match other text areas */
+    min-height: 140px; /* Match the wrapper's min-height */
+}
+
+/* Placeholder style */
+.description textarea::placeholder { /* Target the actual textarea element within MentionsInput */
+    color: #cccccc;
+    opacity: 1;
+    transition: color 0.3s ease;
+}
+
+.description textarea:focus::placeholder {
+    color: #e0e0e0;
+}
+
+/* Focus state for the entire MentionsInput wrapper */
+.description.is-focused { /* `is-focused` is a class added by react-mentions on focus */
+    outline: none;
+    border-color: var(--mentions-input-focus-border);
+    background: var(--mentions-input-focus-bg);
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.4), 0 0 0 3px var(--mentions-input-focus-shadow);
+    color: var(--text-white-navbar);
+}
+
+/* Mentions suggestion list */
+.description__suggestions {
+    background-color: var(--mentions-list-bg);
+    border: 1px solid var(--mentions-list-border);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    overflow: hidden; /* Ensure rounded corners are respected */
+    margin-top: 5px; /* Space between input and dropdown */
+    z-index: 1000; /* Ensure it appears above other elements */
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+}
+
+.description__suggestions__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.description__suggestions__item {
+    padding: 10px 15px;
+    cursor: pointer;
+    color: var(--text-white-navbar);
+    transition: background-color 0.2s ease;
+}
+
+.description__suggestions__item--focused {
+    background-color: var(--mentions-item-hover-bg);
+}
+
+.description__suggestions__item:hover {
+    background-color: var(--mentions-item-hover-bg);
+}
+
+/* Style for mentioned text within the input */
+.description__mention {
+    background-color: rgba(0, 191, 255, 0.2); /* Light blue background for mentions */
+    color: var(--mentions-highlight-color); /* Bright blue text for mentions */
+    font-weight: 600;
+    padding: 2px 4px;
+    border-radius: 4px;
 }
 
 
+/* --- File Input --- */
 .file-input {
-    background: rgba(0, 123, 255, 0.05); 
-    border: 1px solid rgba(0, 123, 255, 0.2); 
-    padding: 12px 15px; 
+    background: rgba(0, 123, 255, 0.05);
+    border: 1px solid rgba(0, 123, 255, 0.2);
+    padding: 12px 15px;
     cursor: pointer;
-    border-radius: 10px; 
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); 
-    color: var(--text-light-navbar); 
+    border-radius: 10px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    color: var(--text-light-navbar);
+    box-sizing: border-box; /* Ensure padding is included */
 }
 
 .file-input::-webkit-file-upload-button {
@@ -185,7 +290,6 @@ body {
 .file-input::before {
     content: 'Choose Files';
     display: inline-block;
-    
     background: linear-gradient(to right, var(--primary-blue-navbar), var(--secondary-blue-navbar));
     color: var(--text-white-navbar);
     padding: 8px 16px;
@@ -197,81 +301,80 @@ body {
     font-weight: 600;
     font-size: 0.95rem;
     transition: all 0.2s ease-in-out;
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3); 
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
 }
 
 .file-input:hover::before {
-    
     background: linear-gradient(to left, var(--primary-blue-navbar), var(--secondary-blue-navbar));
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.5); 
-    transform: translateY(-1px); 
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.5);
+    transform: translateY(-1px);
 }
 
-
+/* --- Media Preview --- */
 .media-preview {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px; 
-    margin-top: 20px; 
-    border-top: 1px dashed var(--border-color-navbar); 
+    gap: 15px;
+    margin-top: 20px;
+    border-top: 1px dashed var(--border-color-navbar);
     padding-top: 15px;
 }
 
 .media-item {
-    border: 1px solid rgba(0, 123, 255, 0.2); 
-    max-width: 180px; 
-    max-height: 120px; 
-    object-fit: cover; 
-    border-radius: 8px; 
-    background-color: rgba(0, 0, 0, 0.5); 
-    box-shadow: 0px 4px 15px var(--shadow-color-navbar); 
+    border: 1px solid rgba(0, 123, 255, 0.2);
+    max-width: 180px;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 4px 15px var(--shadow-color-navbar);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .media-item:hover {
-    transform: translateY(-2px); 
-    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4); 
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
 }
 
-
+/* --- Submit Button --- */
 .submit-post-btn {
-    display: block; 
-    width: fit-content; 
-    margin: 30px auto 0; 
-    padding: 14px 35px; 
-    font-size: 1.1rem; 
+    display: block;
+    width: fit-content;
+    margin: 30px auto 0;
+    padding: 14px 35px;
+    font-size: 1.1rem;
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: var(--text-white-navbar); 
-    
+    color: var(--text-white-navbar);
     background: linear-gradient(to right, var(--primary-blue-navbar), var(--secondary-blue-navbar));
-    border: none; 
-    border-radius: 50px; 
+    border: none;
+    border-radius: 50px;
     cursor: pointer;
-    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4); 
+    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
     transition: all 0.3s ease-in-out;
 }
 
 .submit-post-btn:hover {
-    background: linear-gradient(to left, var(--primary-blue-navbar), var(--secondary-blue-navbar)); 
-    box-shadow: 0 12px 35px rgba(0, 191, 255, 0.6); 
-    transform: translateY(-4px) scale(1.02); 
+    background: linear-gradient(to left, var(--primary-blue-navbar), var(--secondary-blue-navbar));
+    box-shadow: 0 12px 35px rgba(0, 191, 255, 0.6);
+    transform: translateY(-4px) scale(1.02);
 }
 
-
+/* --- Media Queries --- */
 @media (max-width: 768px) {
     .create-post-container {
         padding: 30px 25px;
     }
 
-    .create-title {
+    .create-post-title {
         font-size: 1.8rem;
         margin-bottom: 25px;
     }
 
     .form-group input,
-    .form-group textarea {
+    .description__suggestions__input,
+    .description__highlighter {
         padding: 12px 15px;
         font-size: 0.95rem;
     }
@@ -288,25 +391,53 @@ body {
 }
 
 @media (max-width: 480px) {
-    .create-post-wrapper {
+    .create-post-page {
         padding: 30px 15px;
     }
 
     .create-post-container {
         padding: 25px 20px;
+        border-radius: 0; /* Full width, no corner radius on small screens */
+        border: none; /* No border on small screens */
+        box-shadow: none; /* No shadow on small screens */
+        backdrop-filter: none; /* No blur on small screens */
+        -webkit-backdrop-filter: none;
+        background: var(--create-bg-dark); /* Solid background */
     }
 
-    .create-title {
+    .create-post-title {
         font-size: 1.6rem;
     }
 
     .submit-post-btn {
-        width: 100%; 
+        width: 100%;
         margin-top: 25px;
+        border-radius: 8px; /* Slightly less rounded on mobile button */
     }
 
     .file-input::before {
         font-size: 0.85rem;
         padding: 7px 14px;
+    }
+
+    .description,
+    .description.is-focused {
+        background: var(--create-bg-dark); /* Solid background on mobile */
+        border: 1px solid var(--border-color-navbar); /* Simple border */
+        box-shadow: none; /* No inner/outer shadows */
+        backdrop-filter: none; /* No blur on mobile */
+        -webkit-backdrop-filter: none;
+    }
+
+    .description__suggestions {
+        background-color: var(--create-bg-dark);
+        border: 1px solid var(--border-color-navbar);
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    .description__mention {
+        background-color: rgba(0, 191, 255, 0.1); /* Lighter background for mentions on mobile */
     }
 }

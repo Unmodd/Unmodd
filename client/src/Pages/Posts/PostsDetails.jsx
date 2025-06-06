@@ -9,8 +9,6 @@ import { FaAngleUp, FaAngleDown } from "react-icons/fa6";
 
 
 import { MentionsInput, Mention } from 'react-mentions';
-import defaultStyle from '../CreatePost/defaultStyle';
-import mentionStyle from '../CreatePost/mentionStyle';
 
 import './Posts.css';
 import Avatar from '../../components/Avatar/Avatar';
@@ -310,14 +308,12 @@ const PostsDetails = () => {
                     <MentionsInput
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
-                        style={defaultStyle}
                         placeholder="Type your comment here. Use @ to mention users!"
                         className="comment-mentions-input"
                     >
                         <Mention
                             trigger="@"
-                            data={onCommentMentionsAdd} 
-                            style={mentionStyle}
+                            data={onCommentMentionsAdd}
                             displayTransform={(id, display) => `@${display}`}
                             appendSpaceOnAdd={true}
                         />
